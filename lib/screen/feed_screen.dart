@@ -1,7 +1,6 @@
 
 import 'dart:io';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ndialog/ndialog.dart';
@@ -25,7 +24,8 @@ class _FeedScreenState extends State<FeedScreen> {
       future: conexionInternet(),
       builder: (BuildContext context, AsyncSnapshot<bool> snapshot){
         if(snapshot.hasData){
-          if(true){
+          print(snapshot.data!);
+          if(snapshot.data!){
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: Color(0xbabad6fc),
@@ -69,8 +69,6 @@ class _FeedScreenState extends State<FeedScreen> {
               ),
               floatingActionButton: FloatingActionButton(
                 onPressed: () {
-                  //conexionError(context);
-                  //loadImageError(context); 
                   _openCamera(context);
                 },
                 tooltip: 'Nueva Publicación',
@@ -170,11 +168,16 @@ void conexionError(BuildContext context){
     ),
   ).show(context);
 }
-Future<bool> conexionInternet(){
-  var ConextionResult = Connectivity().checkConnectivity();
-  if(ConextionResult == ConnectivityResult.wifi){
-    return Future.value(true);
-  }else{
+Future<bool> conexionInternet() async{
+  try{
+    final result = await InternetAddress.lookup('google.com');
+    if(result.isNotEmpty&&result[0].rawAddress.isNotEmpty) {
+      return Future.value(true);
+    } else {
+      return Future.value(false);
+    }
+  } on SocketException catch (_){
     return Future.value(false);
   }
+  
 } 
